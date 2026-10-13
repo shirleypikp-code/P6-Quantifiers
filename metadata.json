@@ -1,0 +1,6 @@
+{
+  "name": "Quantifier Quest: The Grammar Adventure",
+  "description": "An interactive educational quest on quantifiers featuring story chapters, dynamic minigames, real-time multiplayer duel with friends, a 10-item mastery quiz, reflection journal, and certificate generation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
