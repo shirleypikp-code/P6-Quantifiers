@@ -68,9 +68,16 @@ export interface QuizQuestion {
   categoryTag: string;
 }
 
+export interface UserProfile {
+  name: string;
+  className: string;
+  avatar: string;
+}
+
 export interface MultiplayerPlayer {
   id: string;
   name: string;
+  playerClass?: string;
   score: number;
   streak: number;
   currentQuestion: number;
@@ -101,6 +108,7 @@ export interface ReflectionData {
 
 export interface CertificateData {
   recipientName: string;
+  recipientClass?: string;
   scorePercent: number;
   dateEarned: string;
   certificateId: string;
@@ -111,6 +119,7 @@ export interface CertificateData {
 export interface LeaderboardEntry {
   id: string;
   playerName: string;
+  playerClass?: string;
   avatar: string;
   category: 'overall' | 'quiz' | 'multiplayer';
   score: number;

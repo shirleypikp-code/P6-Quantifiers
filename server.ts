@@ -18,6 +18,7 @@ app.use(express.json());
 interface Player {
   id: string;
   name: string;
+  playerClass?: string;
   avatar: string;
   score: number;
   streak: number;
@@ -42,7 +43,8 @@ const rooms: Record<string, Room> = {};
 const leaderboard: LeaderboardEntry[] = [
   {
     id: 'lb_init_1',
-    playerName: 'Chloe Tan (P6-A)',
+    playerName: 'Chloe Tan',
+    playerClass: 'Primary 6-A',
     avatar: '🦊',
     category: 'quiz',
     score: 100,
@@ -54,7 +56,8 @@ const leaderboard: LeaderboardEntry[] = [
   },
   {
     id: 'lb_init_2',
-    playerName: 'Aiden Lim (P6-C)',
+    playerName: 'Aiden Lim',
+    playerClass: 'Primary 6-C',
     avatar: '🦉',
     category: 'multiplayer',
     score: 1450,
@@ -66,7 +69,8 @@ const leaderboard: LeaderboardEntry[] = [
   },
   {
     id: 'lb_init_3',
-    playerName: 'Maya Scribe (P6-B)',
+    playerName: 'Maya Scribe',
+    playerClass: 'Primary 6-B',
     avatar: '🏛️',
     category: 'quiz',
     score: 100,
@@ -78,7 +82,8 @@ const leaderboard: LeaderboardEntry[] = [
   },
   {
     id: 'lb_init_4',
-    playerName: 'Lucas Wang (P6-A)',
+    playerName: 'Lucas Wang',
+    playerClass: 'Primary 6-A',
     avatar: '🧙‍♂️',
     category: 'overall',
     score: 90,
@@ -105,6 +110,7 @@ function getSafeRoom(room: Room) {
     playersCopy[id] = {
       id: player.id,
       name: player.name,
+      playerClass: player.playerClass,
       avatar: player.avatar,
       score: player.score,
       streak: player.streak,
@@ -195,7 +201,7 @@ app.get('/api/leaderboard', (req, res) => {
 });
 
 app.post('/api/leaderboard', (req, res) => {
-  const { playerName, avatar, category, score, accuracyPercent, stickersCount, note, date } = req.body;
+  const { playerName, playerClass, avatar, category, score, accuracyPercent, stickersCount, note, date } = req.body;
   if (!playerName || typeof score !== 'number') {
     return res.status(400).json({ error: 'Invalid score entry' });
   }
@@ -208,6 +214,7 @@ app.post('/api/leaderboard', (req, res) => {
 
   recordLeaderboardEntry({
     playerName: (playerName || 'Anonymous Scholar').slice(0, 24),
+    playerClass: (playerClass || '').slice(0, 20),
     avatar: avatar || '🧙‍♂️',
     category: category || 'overall',
     score,
@@ -243,10 +250,11 @@ wss.on('connection', (ws: WebSocket) => {
       }
 
       if (msg.type === 'SUBMIT_SCORE') {
-        const { playerName, avatar, category, score, accuracyPercent, stickersCount, note } = msg;
+        const { playerName, playerClass, avatar, category, score, accuracyPercent, stickersCount, note } = msg;
         if (playerName && typeof score === 'number') {
           recordLeaderboardEntry({
             playerName: (playerName || 'Player').slice(0, 24),
+            playerClass: (playerClass || '').slice(0, 20),
             avatar: avatar || '🧙‍♂️',
             category: category || 'overall',
             score,
@@ -269,6 +277,7 @@ wss.on('connection', (ws: WebSocket) => {
         const player: Player = {
           id: playerId,
           name: (msg.playerName || 'Player 1').slice(0, 18),
+          playerClass: (msg.playerClass || '').slice(0, 20),
           avatar: msg.avatar || '🧙‍♂️',
           score: 0,
           streak: 0,
@@ -319,11 +328,13 @@ wss.on('connection', (ws: WebSocket) => {
         if (existingPlayer) {
           existingPlayer.ws = ws;
           if (msg.playerName) existingPlayer.name = msg.playerName.slice(0, 18);
+          if (msg.playerClass) existingPlayer.playerClass = msg.playerClass.slice(0, 20);
           if (msg.avatar) existingPlayer.avatar = msg.avatar;
         } else {
           room.players[playerId] = {
             id: playerId,
             name: (msg.playerName || `Player ${Object.keys(room.players).length + 1}`).slice(0, 18),
+            playerClass: (msg.playerClass || '').slice(0, 20),
             avatar: msg.avatar || '🕵️‍♂️',
             score: 0,
             streak: 0,
@@ -399,6 +410,7 @@ wss.on('connection', (ws: WebSocket) => {
           for (const p of sortedPlayers) {
             recordLeaderboardEntry({
               playerName: p.name,
+              playerClass: p.playerClass || '',
               avatar: p.avatar,
               category: 'multiplayer',
               score: p.score,

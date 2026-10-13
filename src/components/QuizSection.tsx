@@ -70,11 +70,13 @@ export const QuizSection: React.FC<QuizSectionProps> = ({
 
       // Automatically post score to global Leaderboard
       const storedPlayerName = localStorage.getItem('qq_player_name') || 'Student ' + Math.floor(100 + Math.random() * 900);
+      const storedPlayerClass = localStorage.getItem('qq_player_class') || 'Primary 6-A';
       fetch('/api/leaderboard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           playerName: storedPlayerName,
+          playerClass: storedPlayerClass,
           category: 'quiz',
           score: percent,
           accuracyPercent: percent,

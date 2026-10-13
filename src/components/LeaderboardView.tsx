@@ -17,6 +17,7 @@ import {
 
 interface LeaderboardViewProps {
   currentUserName: string;
+  currentUserClass: string;
   currentUserAvatar: string;
   bestQuizScore: number;
   unlockedStickersCount: number;
@@ -26,6 +27,7 @@ interface LeaderboardViewProps {
 
 export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   currentUserName,
+  currentUserClass,
   currentUserAvatar,
   bestQuizScore,
   unlockedStickersCount,
@@ -66,6 +68,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     try {
       const payload = {
         playerName: currentUserName,
+        playerClass: currentUserClass,
         avatar: currentUserAvatar,
         category: 'quiz',
         score: bestQuizScore,
@@ -98,8 +101,10 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
   const filteredEntries = entries.filter((entry) => {
     const matchesCat = filterCategory === 'all' || entry.category === filterCategory;
-    const matchesSearch = entry.playerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (entry.note && entry.note.toLowerCase().includes(searchQuery.toLowerCase()));
+    const query = searchQuery.toLowerCase();
+    const matchesSearch = entry.playerName.toLowerCase().includes(query) ||
+      (entry.playerClass && entry.playerClass.toLowerCase().includes(query)) ||
+      (entry.note && entry.note.toLowerCase().includes(query));
     return matchesCat && matchesSearch;
   });
 
@@ -199,6 +204,11 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   </div>
                   <div className="text-3xl my-2">{topThree[1].avatar}</div>
                   <h4 className="font-bold text-sm text-white truncate">{topThree[1].playerName}</h4>
+                  {topThree[1].playerClass && (
+                    <span className="text-[10px] font-bold font-mono text-indigo-300 bg-indigo-950/80 px-2 py-0.5 rounded-full border border-indigo-500/30 inline-block mt-0.5">
+                      {topThree[1].playerClass}
+                    </span>
+                  )}
                   <div className="text-base font-extrabold font-mono text-slate-200 mt-1">
                     {topThree[1].score} {topThree[1].category === 'quiz' ? '%' : 'pts'}
                   </div>
@@ -216,6 +226,11 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   </div>
                   <div className="text-4xl my-2 animate-bounce">{topThree[0].avatar}</div>
                   <h3 className="font-extrabold text-base text-amber-200 truncate">{topThree[0].playerName}</h3>
+                  {topThree[0].playerClass && (
+                    <span className="text-[10px] font-bold font-mono text-amber-300 bg-amber-950/80 px-2.5 py-0.5 rounded-full border border-amber-500/40 inline-block mt-0.5">
+                      {topThree[0].playerClass}
+                    </span>
+                  )}
                   <div className="text-xl font-black font-mono text-amber-400 mt-1">
                     {topThree[0].score} {topThree[0].category === 'quiz' ? '%' : 'pts'}
                   </div>
@@ -233,6 +248,11 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   </div>
                   <div className="text-3xl my-2">{topThree[2].avatar}</div>
                   <h4 className="font-bold text-sm text-white truncate">{topThree[2].playerName}</h4>
+                  {topThree[2].playerClass && (
+                    <span className="text-[10px] font-bold font-mono text-indigo-300 bg-indigo-950/80 px-2 py-0.5 rounded-full border border-indigo-500/30 inline-block mt-0.5">
+                      {topThree[2].playerClass}
+                    </span>
+                  )}
                   <div className="text-base font-extrabold font-mono text-amber-300 mt-1">
                     {topThree[2].score} {topThree[2].category === 'quiz' ? '%' : 'pts'}
                   </div>
@@ -271,7 +291,12 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                     <span className="text-2xl">{entry.avatar}</span>
                     <div>
                       <div className="font-bold text-sm text-white flex items-center gap-2">
-                        {entry.playerName}
+                        <span>{entry.playerName}</span>
+                        {entry.playerClass && (
+                          <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-300 border border-indigo-500/30">
+                            {entry.playerClass}
+                          </span>
+                        )}
                         {isCurrentUser && (
                           <span className="text-[10px] font-bold uppercase bg-amber-500 text-slate-950 px-1.5 rounded">
                             You

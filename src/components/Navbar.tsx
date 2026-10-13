@@ -11,9 +11,11 @@ import {
   Sparkles,
   PenTool,
   FlaskConical,
-  Trophy
+  Trophy,
+  UserCheck
 } from 'lucide-react';
 import { sounds } from '../utils/audio';
+import { UserProfile } from '../types/game';
 
 export type AppTab = 'chapters' | 'noun_lab' | 'minigames' | 'multiplayer' | 'quiz' | 'leaderboard' | 'reflection' | 'codex';
 
@@ -23,8 +25,10 @@ interface NavbarProps {
   quizScorePercent: number;
   hasPassed95: boolean;
   unlockedStickersCount: number;
+  userProfile: UserProfile;
   onOpenCertificate: () => void;
   onOpenStickerAlbum: () => void;
+  onOpenProfileModal: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -33,8 +37,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   quizScorePercent,
   hasPassed95,
   unlockedStickersCount,
+  userProfile,
   onOpenCertificate,
-  onOpenStickerAlbum
+  onOpenStickerAlbum,
+  onOpenProfileModal
 }) => {
   const [soundOn, setSoundOn] = React.useState(sounds.isSoundEnabled());
 
@@ -97,7 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     sounds.playClick();
                     setActiveTab(item.id);
                   }}
-                  className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     isActive
                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-inner'
                       : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -115,15 +121,36 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </nav>
 
-          {/* Right actions: Sticker Album CTA + Certificate CTA + Sound Toggle */}
+          {/* Right actions: Student Badge Profile + Sticker Album + Certificate + Sound */}
           <div className="flex items-center gap-2">
+            {/* Student ID Badge */}
+            <button
+              onClick={() => {
+                sounds.playClick();
+                onOpenProfileModal();
+              }}
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-750 border border-indigo-400/40 text-xs text-indigo-200 transition-all group shadow-sm"
+              title="Click to view/change your Name and Class identification"
+            >
+              <span className="text-base">{userProfile.avatar}</span>
+              <div className="text-left hidden md:block max-w-[120px]">
+                <div className="font-bold leading-tight text-white truncate group-hover:text-amber-300 transition-colors">
+                  {userProfile.name || 'Set ID'}
+                </div>
+                <div className="text-[9px] text-amber-300/90 font-mono truncate">
+                  {userProfile.className || 'P6'}
+                </div>
+              </div>
+              <UserCheck className="w-3.5 h-3.5 text-indigo-400 group-hover:text-amber-300 ml-0.5 shrink-0" />
+            </button>
+
             {/* Sticker Album button */}
             <button
               onClick={() => {
                 sounds.playClick();
                 onOpenStickerAlbum();
               }}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/30 text-xs font-bold transition-all"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/30 text-xs font-bold transition-all"
               title="Open your Sticker Album"
             >
               <span className="text-sm">⭐</span>
@@ -139,7 +166,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 sounds.playClick();
                 onOpenCertificate();
               }}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
                 hasPassed95
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 border-amber-300 shadow-md shadow-amber-500/20 animate-pulse hover:scale-105'
                   : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-amber-500/40'
@@ -147,7 +174,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               title={hasPassed95 ? "Certificate unlocked! Click to view" : "Reach 95% on the quiz to unlock certificate"}
             >
               <Award className={`w-3.5 h-3.5 ${hasPassed95 ? 'text-slate-950' : 'text-amber-400'}`} />
-              <span className="hidden md:inline">Certificate</span>
+              <span className="hidden xl:inline">Certificate</span>
               <span className={`text-[10px] px-1.5 py-0.2 rounded font-mono ${hasPassed95 ? 'bg-amber-700 text-white' : 'bg-slate-900 text-amber-400'}`}>
                 {quizScorePercent}%
               </span>
@@ -155,7 +182,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={handleToggleSound}
-              className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700/80 transition-colors border border-slate-700/80"
+              className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700/80 transition-colors border border-slate-700/80"
               title={soundOn ? 'Mute Sound' : 'Enable Sound'}
               aria-label={soundOn ? 'Mute Sound' : 'Enable Sound'}
             >

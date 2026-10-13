@@ -19,6 +19,9 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
   const [recipientName, setRecipientName] = useState(() => {
     return localStorage.getItem('qq_player_name') || 'Honored Scholar';
   });
+  const [recipientClass, setRecipientClass] = useState(() => {
+    return localStorage.getItem('qq_player_class') || 'Primary 6-A';
+  });
   const [certificateId] = useState(() => {
     return `QQ-${Math.floor(100000 + Math.random() * 900000)}-${new Date().getFullYear()}`;
   });
@@ -101,19 +104,35 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
               </div>
             </div>
 
-            {/* Recipient Name Customization Input */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-slate-950/60 p-3.5 rounded-2xl border border-slate-800 text-xs">
-              <span className="text-slate-400 font-semibold shrink-0">
-                Name on Certificate:
-              </span>
-              <input
-                type="text"
-                value={recipientName}
-                onChange={(e) => setRecipientName(e.target.value)}
-                maxLength={40}
-                placeholder="Enter student full name..."
-                className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold text-sm focus:outline-none focus:border-amber-400"
-              />
+            {/* Recipient Name & Class Customization Inputs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950/60 p-3.5 rounded-2xl border border-slate-800 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 font-semibold shrink-0">
+                  Name:
+                </span>
+                <input
+                  type="text"
+                  value={recipientName}
+                  onChange={(e) => setRecipientName(e.target.value)}
+                  maxLength={40}
+                  placeholder="Enter student full name..."
+                  className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold text-sm focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 font-semibold shrink-0">
+                  Class:
+                </span>
+                <input
+                  type="text"
+                  value={recipientClass}
+                  onChange={(e) => setRecipientClass(e.target.value)}
+                  maxLength={25}
+                  placeholder="Enter class (e.g. Primary 6-A)..."
+                  className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-indigo-300 font-bold text-sm focus:outline-none focus:border-indigo-400"
+                />
+              </div>
             </div>
 
             {/* Printable Certificate Frame */}
@@ -151,11 +170,16 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                     This credential formally certifies that
                   </p>
 
-                  {/* Student Name */}
-                  <div className="py-2">
+                  {/* Student Name & Class */}
+                  <div className="py-2 space-y-1">
                     <div className="text-2xl sm:text-4xl font-extrabold text-amber-900 font-serif border-b-2 border-amber-800/40 inline-block px-8 pb-1 tracking-wide">
                       {recipientName || 'Honored Scholar'}
                     </div>
+                    {recipientClass && (
+                      <div className="text-xs sm:text-sm font-bold font-mono text-amber-800 tracking-wider">
+                        Class: {recipientClass}
+                      </div>
+                    )}
                   </div>
 
                   <p className="text-xs sm:text-sm text-slate-700 max-w-lg mx-auto leading-relaxed">

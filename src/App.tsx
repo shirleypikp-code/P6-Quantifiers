@@ -14,9 +14,10 @@ import { ReflectionSection } from './components/ReflectionSection';
 import { CodexModal } from './components/CodexModal';
 import { CertificateModal } from './components/CertificateModal';
 import { StickerAlbumModal } from './components/StickerAlbumModal';
+import { StudentProfileModal } from './components/StudentProfileModal';
 import { LeaderboardView } from './components/LeaderboardView';
 import { STICKERS_COLLECTION } from './data/quantifierData';
-import { Sticker } from './types/game';
+import { Sticker, UserProfile } from './types/game';
 import { sounds } from './utils/audio';
 import confetti from 'canvas-confetti';
 import { 
@@ -35,6 +36,38 @@ import {
 export default function App() {
   const [activeTab, setActiveTab] = useState<AppTab>('chapters');
   const [initialMinigame, setInitialMinigame] = useState<string | null>(null);
+
+  // Student Profile Identification State (Name, Class, Avatar)
+  const [userProfile, setUserProfile] = useState<UserProfile>(() => {
+    const saved = localStorage.getItem('qq_student_profile');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
+    }
+    const legacyName = localStorage.getItem('qq_player_name');
+    const legacyClass = localStorage.getItem('qq_player_class');
+    return {
+      name: legacyName || '',
+      className: legacyClass || 'Primary 6-A',
+      avatar: '🧙‍♂️'
+    };
+  });
+
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [isInitialSetup, setIsInitialSetup] = useState(() => {
+    const saved = localStorage.getItem('qq_student_profile');
+    const legacyName = localStorage.getItem('qq_player_name');
+    return !saved && !legacyName;
+  });
+
+  const handleSaveProfile = (profile: UserProfile) => {
+    setUserProfile(profile);
+    localStorage.setItem('qq_student_profile', JSON.stringify(profile));
+    localStorage.setItem('qq_player_name', profile.name);
+    localStorage.setItem('qq_player_class', profile.className);
+    setIsInitialSetup(false);
+  };
   
   const [completedChapters, setCompletedChapters] = useState<number[]>(() => {
     const saved = localStorage.getItem('qq_completed_chapters');
@@ -120,8 +153,10 @@ export default function App() {
         quizScorePercent={bestQuizScore}
         hasPassed95={hasPassed95}
         unlockedStickersCount={unlockedStickerIds.length}
+        userProfile={userProfile}
         onOpenCertificate={() => setShowCertificateModal(true)}
         onOpenStickerAlbum={() => setShowStickerAlbum(true)}
+        onOpenProfileModal={() => setShowProfileModal(true)}
       />
 
       {/* Main Content Area */}
@@ -261,8 +296,9 @@ export default function App() {
 
         {activeTab === 'leaderboard' && (
           <LeaderboardView
-            currentUserName={localStorage.getItem('qq_player_name') || 'Scholar ' + Math.floor(100 + Math.random() * 900)}
-            currentUserAvatar="🧙‍♂️"
+            currentUserName={userProfile.name || 'Scholar ' + Math.floor(100 + Math.random() * 900)}
+            currentUserClass={userProfile.className || 'Primary 6-A'}
+            currentUserAvatar={userProfile.avatar || '🧙‍♂️'}
             bestQuizScore={bestQuizScore}
             unlockedStickersCount={unlockedStickerIds.length}
             onGoToQuiz={() => {
@@ -288,6 +324,19 @@ export default function App() {
           <CodexModal isEmbedded={true} />
         )}
       </main>
+
+      {/* Student Identification Profile Modal */}
+      <StudentProfileModal
+        isOpen={showProfileModal || isInitialSetup}
+        onClose={() => {
+          if (!isInitialSetup) {
+            setShowProfileModal(false);
+          }
+        }}
+        currentProfile={userProfile}
+        onSaveProfile={handleSaveProfile}
+        isInitialSetup={isInitialSetup}
+      />
 
       {/* Certificate Modal */}
       <CertificateModal

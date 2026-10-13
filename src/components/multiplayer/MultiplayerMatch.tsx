@@ -28,6 +28,9 @@ export const MultiplayerMatch: React.FC<MultiplayerMatchProps> = ({ onBackToMenu
   const [playerName, setPlayerName] = useState(() => {
     return localStorage.getItem('qq_player_name') || `Player_${Math.floor(100 + Math.random() * 900)}`;
   });
+  const [playerClass, setPlayerClass] = useState(() => {
+    return localStorage.getItem('qq_player_class') || 'Primary 6-A';
+  });
   const [playerAvatar, setPlayerAvatar] = useState('🧙‍♂️');
   const [playerId] = useState(() => `usr_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`);
   const [roomCodeInput, setRoomCodeInput] = useState('');
@@ -59,10 +62,11 @@ export const MultiplayerMatch: React.FC<MultiplayerMatchProps> = ({ onBackToMenu
     }
   }, []);
 
-  // Save player name to local storage
+  // Save player name and class to local storage
   useEffect(() => {
     localStorage.setItem('qq_player_name', playerName);
-  }, [playerName]);
+    localStorage.setItem('qq_player_class', playerClass);
+  }, [playerName, playerClass]);
 
   // Connect to WebSocket server
   useEffect(() => {
@@ -179,6 +183,7 @@ export const MultiplayerMatch: React.FC<MultiplayerMatchProps> = ({ onBackToMenu
       type: 'CREATE_ROOM',
       playerId,
       playerName: playerName.trim() || 'Host',
+      playerClass: playerClass.trim() || 'Primary 6-A',
       avatar: playerAvatar
     }));
   };
@@ -200,6 +205,7 @@ export const MultiplayerMatch: React.FC<MultiplayerMatchProps> = ({ onBackToMenu
       code,
       playerId,
       playerName: playerName.trim() || 'Player',
+      playerClass: playerClass.trim() || 'Primary 6-A',
       avatar: playerAvatar
     }));
   };
@@ -219,7 +225,8 @@ export const MultiplayerMatch: React.FC<MultiplayerMatchProps> = ({ onBackToMenu
       setBotChallengerActive(true);
       setBotPlayer({
         id: 'bot_scribe',
-        name: 'Scholar Rowan (Bot)',
+        name: 'Scholar Rowan',
+        playerClass: 'P6 Challenger',
         avatar: '🦊',
         score: 0,
         streak: 0,
@@ -341,15 +348,29 @@ export const MultiplayerMatch: React.FC<MultiplayerMatchProps> = ({ onBackToMenu
           {/* Profile Setup */}
           <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-6 max-w-md mx-auto space-y-4">
             <div>
-              <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">
-                Your Player Name:
+              <label className="text-xs font-bold text-amber-300 uppercase tracking-wider block mb-1.5">
+                Your Player Name: <span className="text-rose-400">*</span>
               </label>
               <input
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
-                maxLength={18}
+                maxLength={24}
                 placeholder="Enter your name..."
+                className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm font-semibold text-white focus:outline-none focus:border-indigo-400"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-amber-300 uppercase tracking-wider block mb-1.5">
+                Your Class / Section: <span className="text-rose-400">*</span>
+              </label>
+              <input
+                type="text"
+                value={playerClass}
+                onChange={(e) => setPlayerClass(e.target.value)}
+                maxLength={20}
+                placeholder="e.g. Primary 6-A or P6 Integrity..."
                 className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm font-semibold text-white focus:outline-none focus:border-indigo-400"
               />
             </div>
@@ -496,8 +517,13 @@ export const MultiplayerMatch: React.FC<MultiplayerMatchProps> = ({ onBackToMenu
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{player.avatar}</span>
                     <div>
-                      <div className="font-bold text-sm text-white flex items-center gap-1.5">
-                        {player.name}
+                      <div className="font-bold text-sm text-white flex items-center gap-1.5 flex-wrap">
+                        <span>{player.name}</span>
+                        {player.playerClass && (
+                          <span className="text-[10px] font-mono text-indigo-300 font-bold bg-indigo-950/80 px-1.5 py-0.2 rounded border border-indigo-500/30">
+                            {player.playerClass}
+                          </span>
+                        )}
                         {player.id === playerId && (
                           <span className="text-[10px] text-amber-400 bg-amber-500/20 px-1.5 rounded">You</span>
                         )}
@@ -570,8 +596,13 @@ export const MultiplayerMatch: React.FC<MultiplayerMatchProps> = ({ onBackToMenu
                       Q: {p.currentQuestion}/{MULTIPLAYER_BATTLE_QUESTIONS.length}
                     </span>
                   </div>
-                  <div className="font-bold text-xs truncate">
-                    {p.name} {p.id === playerId ? '(You)' : ''}
+                  <div className="font-bold text-xs truncate flex items-center justify-between">
+                    <span>{p.name} {p.id === playerId ? '(You)' : ''}</span>
+                    {p.playerClass && (
+                      <span className="text-[9px] font-mono text-indigo-300 font-bold bg-indigo-950/80 px-1 rounded">
+                        {p.playerClass}
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center justify-between mt-1">
                     <span className="text-base font-extrabold font-mono text-amber-300">
@@ -705,8 +736,16 @@ export const MultiplayerMatch: React.FC<MultiplayerMatchProps> = ({ onBackToMenu
                   </span>
                   <span className="text-2xl">{player.avatar}</span>
                   <div className="text-left">
-                    <div className="font-bold text-sm text-white">
-                      {player.name} {player.id === playerId ? '(You)' : ''}
+                    <div className="font-bold text-sm text-white flex items-center gap-1.5 flex-wrap">
+                      <span>{player.name}</span>
+                      {player.playerClass && (
+                        <span className="text-[10px] font-mono text-indigo-300 font-bold bg-indigo-950/80 px-1.5 py-0.2 rounded border border-indigo-500/30">
+                          {player.playerClass}
+                        </span>
+                      )}
+                      {player.id === playerId && (
+                        <span className="text-[10px] text-amber-400 bg-amber-500/20 px-1 rounded">You</span>
+                      )}
                     </div>
                     <div className="text-[11px] text-slate-400">
                       {rank === 0 ? '🏆 Champion' : rank === 1 ? '🥈 Runner-Up' : '🥉 Competitor'}
